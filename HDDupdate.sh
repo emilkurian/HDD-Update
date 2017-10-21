@@ -9,6 +9,7 @@ FILEPATH="$(pwd)"
 ##### Functions
 
 helper(){
+echo "this is where the help description goes"
 exit 0
 }
 
@@ -93,6 +94,8 @@ do
 	fi
 
 done <"$file"
+rm fwtoload.txt
+rm updater.txt
 }
 
 
@@ -133,35 +136,39 @@ case $key in
     NOARGUMENT="YES"
     shift # past argument
     ;;
+    
 esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 if [ "${SPECIFICDRIVE}" = "YES" ]; then
 	update_drive
-	echo " updating drive"
+	echo " updating drive "
+	drive_sort
+	drive_update
 fi
 if [ "${SPECIFICMODEL}" = "YES" ]; then
 	update_model
 	echo " updating drive model "
+	drive_sort
+	drive_update
 fi
 if [ "${UPDATEALL}" = "YES" ]; then
 	update_all
 	echo " updating all drives"
+	drive_sort
+	drive_update
 fi
 if [ "${OPENHELP}" = "YES" ]; then
 	helper
+
 fi
 if [ "${NOARGUMENT}" = "YES" ]; then
 	helper
 fi
 
 
-drive_sort
-drive_update
-
-rm fwtoload.txt
-rm updater.txt
+helper
 
 echo "Task completed"
 

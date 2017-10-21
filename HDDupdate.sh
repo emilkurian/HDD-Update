@@ -8,8 +8,24 @@ FILEPATH="$(pwd)"
 
 ##### Functions
 
+help(){
+exit 0
+}
+
 update_all(){
 lsscsi -g | grep "disk" > disk.txt
+awk '{print $4" "$5"\t"$6"\t"$7"\t"$8}' disk.txt > data.txt
+column -t data.txt > dataparse.txt
+}
+
+update_model(){
+lsscsi -g | grep "${DRIVEMODEL}" > disk.txt
+awk '{print $4" "$5"\t"$6"\t"$7"\t"$8}' disk.txt > data.txt
+column -t data.txt > dataparse.txt
+}
+
+update_drive(){
+lsscsi -g | grep "${SPECIFICDRIVE}" > disk.txt
 awk '{print $4" "$5"\t"$6"\t"$7"\t"$8}' disk.txt > data.txt
 column -t data.txt > dataparse.txt
 }
@@ -30,6 +46,11 @@ do
     
 done <"$file"
 column -t output.txt > updater.txt
+
+rm output.txt
+rm dataparse.txt
+rm data.txt
+rm disk.txt
 }
 
 
@@ -77,10 +98,12 @@ key="$1"
 
 case $key in
     -a|--all)
-    update_all()
-    ;;
+    UPDATEALL="YES"
+    shift
+    ;;    
     -m|--model)
     DRIVEMODEL="$2"
+    SPECIFICMODEL="YES"
     shift # past argument
     shift # past value
     ;;
@@ -89,9 +112,15 @@ case $key in
     shift # past argument
     shift # past value
     ;;
-    --default)
-    DEFAULT=YES
+    -d|--drive)
+    DRIVELOCATION="$2"
+    SPECIFICDRIVE="YES"
     shift # past argument
+    shift
+    ;;
+    -h|--help)
+    OPENHELP="YES"
+    shift
     ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
@@ -101,10 +130,21 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
-rm output.txt
-rm dataparse.txt
-rm data.txt
-rm disk.txt
+if [ "${SPECIFICDRIVE}" = "YES" ]; then
+	update_drive()
+else if [ "${SPECIFICMODEL}" = "YES" ]; then
+	update_model()
+else if [ "${UPDATEALL}" = "YES" ]; then
+	update_all()
+else if [ "${OPENHELP}" = "YES" ]; then
+	help()
+else
+	help()
+fi
+
+drive_sort()
+drive_update()
+
 rm fwtoload.txt
 rm updater.txt
 

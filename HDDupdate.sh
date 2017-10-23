@@ -1,6 +1,5 @@
 #!/bin/bash
 
-echo 'HDD Update Script'
 ##### Constants
 
 DRIVEFWPATH="$(pwd)"
@@ -9,7 +8,27 @@ FILEPATH="$(pwd)"
 ##### Functions
 
 helper(){
-echo "this is where the help description goes"
+echo "Options ->   [--all] [--drive] [--firmware] [--help] [--model]"
+echo "" 
+echo "where: "
+echo "   --all|-a        Will update all Drives (cannot use with -f/-m/-d)
+   --drive|-d      Will update a specific drive (/dev/sg*)
+   --firmware|-f   Will update to a specific FW revision
+   --help|-h       Script usage information
+   --model|-m      Will update a specific drive model"
+echo "Usage Examples:"
+echo ""
+echo "HDDupdate.sh -m 'Drive Model' -f 'Drive FW' "
+echo "    -Updates specific Drive Model to specific FW"
+echo ""
+echo "HDDupdate.sh -d 'Drive Location'"
+echo "    -Updates specific Drive to latest FW"
+echo ""
+echo "HDDupdate.sh -a"
+echo "    -Updates all drives in the system with latest FW"
+echo ""
+echo "This script is designed to update any HDD in a system, provided that the drive"
+echo "FW is available to the system"
 exit 0
 }
 
@@ -24,7 +43,6 @@ update_model(){
 lsscsi -g | grep "${DRIVEMODEL}" > disk.txt
 awk '{print $4" "$5"\t"$6"\t"$7"\t"$8}' disk.txt > data.txt
 column -t data.txt > dataparse.txt
-echo "push"
 }
 
 update_drive(){
@@ -90,7 +108,7 @@ do
 		fi
 	
 	else
-		echo "$f1 $f2 $f3 updated." >> report.txt
+		echo "$f1 $f2 $f3 current" >> report.txt
 	fi
 
 done <"$file"
@@ -143,28 +161,29 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 if [ "${SPECIFICDRIVE}" = "YES" ]; then
 	update_drive
-	echo " updating drive "
 	drive_sort
 	drive_update
+	exit 0
 fi
 if [ "${SPECIFICMODEL}" = "YES" ]; then
 	update_model
-	echo " updating drive model "
 	drive_sort
 	drive_update
+	exit 0
 fi
 if [ "${UPDATEALL}" = "YES" ]; then
 	update_all
-	echo " updating all drives"
 	drive_sort
 	drive_update
+	exit 0
 fi
 if [ "${OPENHELP}" = "YES" ]; then
 	helper
-
+	exit 0
 fi
 if [ "${NOARGUMENT}" = "YES" ]; then
 	helper
+	exit 0
 fi
 
 

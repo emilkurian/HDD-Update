@@ -11,7 +11,7 @@ helper(){
 echo "Options ->   [--all] [--drive] [--firmware] [--help] [--model]"
 echo "" 
 echo "where: "
-echo "   --all|-a        Will update all Drives (cannot use with -f/-m/-d)
+echo "   --all|-a        Will update all drives (cannot use with -f/-m/-d)
    --drive|-d      Will update a specific drive (/dev/sg*)
    --firmware|-f   Will update to a specific FW revision
    --help|-h       Script usage information
@@ -36,7 +36,6 @@ update_all(){
 lsscsi -g | grep "disk" > disk.txt
 awk '{print $4" "$5"\t"$6"\t"$7"\t"$8}' disk.txt > data.txt
 column -t data.txt > dataparse.txt
-echo "pop"
 }
 
 update_model(){
@@ -49,7 +48,6 @@ update_drive(){
 lsscsi -g | grep "${SPECIFICDRIVE}" > disk.txt
 awk '{print $4" "$5"\t"$6"\t"$7"\t"$8}' disk.txt > data.txt
 column -t data.txt > dataparse.txt
-echo "fizz"
 }
 
 drive_sort(){
@@ -188,8 +186,6 @@ fi
 
 
 helper
-
-echo "Task completed"
 
 
 
